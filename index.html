@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magical Romantic Garden - 7th Month Anniversary Special</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        .font-cursive { font-family: 'Great Vibes', cursive; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; background-color: #06030b; }
+        
+        @keyframes floatGentle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 40px rgba(244, 114, 182, 0.4), inset 0 0 25px rgba(251, 191, 36, 0.2); }
+            50% { box-shadow: 0 0 75px rgba(244, 114, 182, 0.8), inset 0 0 40px rgba(251, 191, 36, 0.45); }
+        }
+        @keyframes dissolveOut {
+            0% { opacity: 1; transform: scale(1); filter: blur(0px); }
+            100% { opacity: 0; transform: scale(1.12); filter: blur(12px); pointer-events: none; }
+        }
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.9); filter: blur(8px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0px); }
+        }
+        .animate-float { animation: floatGentle 6s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
+        .dissolving { animation: dissolveOut 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .appearing { animation: fadeInScale 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .glass-card {
+            background: rgba(18, 8, 28, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 182, 193, 0.35);
+        }
+    </style>
+</head>
+<body class="relative w-screen h-screen m-0 p-0 text-white select-none">
+
+    <canvas id="gardenCanvas" class="absolute inset-0 w-full h-full z-0 pointer-events-auto"></canvas>
+
+    <div id="inputScreen" class="absolute inset-0 z-20 flex items-center justify-center p-4 transition-all duration-700">
+        <div class="glass-card max-w-md w-full p-8 rounded-3xl shadow-2xl animate-float text-center relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-36 h-36 bg-pink-500/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-purple-500/30 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="mb-6 relative z-10">
+                <span class="text-4xl animate-bounce inline-block">🌸</span>
+                <h1 class="font-cinzel text-2xl font-bold mt-2 text-pink-200 tracking-wider">7th Month Anniversary Special</h1>
+                <p class="text-xs text-pink-300/80 mt-1">Enter your special link, song, or sweet memory to enter</p>
+            </div>
+
+            <div class="space-y-4 relative z-10">
+                <div class="relative">
+                    <input type="text" id="linkInput" placeholder="Paste link or type a romantic note..." 
+                        class="w-full px-4 py-3 bg-white/10 border border-pink-300/30 rounded-xl text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/30 text-sm transition-all shadow-inner" />
+                </div>
+                <button id="revealBtn" 
+                    class="w-full py-3.5 px-6 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 font-cinzel font-semibold text-white rounded-xl shadow-lg hover:shadow-pink-500/50 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer">
+                    Unlock Special Message 🌷
+                </button>
+            </div>
+            
+            <div id="errorMsg" class="text-xs text-rose-300 mt-3 hidden relative z-10">Please enter something special first! ✨</div>
+        </div>
+    </div>
+
+    <div id="gardenScreen" class="absolute inset-0 z-10 flex flex-col items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="glass-card max-w-xl w-full p-8 md:p-12 rounded-3xl shadow-2xl animate-pulse-glow text-center relative overflow-hidden backdrop-blur-2xl">
+            <div class="absolute -top-20 -left-20 w-48 h-48 bg-rose-500/25 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-48 h-48 bg-amber-500/25 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="space-y-6 relative z-10">
+                <div class="flex justify-center space-x-3 text-2xl animate-bounce">
+                    <span>🌹</span><span>🌻</span><span>🌸</span><span>🌷</span><span>🌺</span>
+                </div>
+
+                <div id="userCustomDisplay" class="hidden text-xs uppercase tracking-widest text-pink-300 font-semibold bg-pink-500/15 py-1.5 px-4 rounded-full inline-block border border-pink-500/30 shadow-sm"></div>
+
+                <h2 class="font-cursive text-5xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-pink-200 via-rose-300 to-amber-200 py-2 leading-tight drop-shadow-sm">
+                    Thank you for everything...
+                </h2>
+
+                <p class="font-cinzel text-xl md:text-3xl text-pink-100 font-bold tracking-wide drop-shadow-sm">
+                    I love you so much, lil girl✨.
+                </p>
+
+                <p class="text-xs md:text-sm text-pink-200/80 max-w-md mx-auto font-light leading-relaxed">
+                   Y are the best chapter in my life.It's been 7 months then. I could nvr forget y or replace y. Y have occured a special place in my heart...which can't be reached.Ig it's not enough to express how I feel abt y but trust me it's smth very special.Move your mouse to create gentle breezes or click anywhere to bloom new flowers.
+                </p>
+
+                <div id="customLinkContainer" class="pt-2 hidden">
+                    <a id="customLinkBtn" href="#" target="_blank" rel="noopener noreferrer" 
+                        class="inline-flex items-center space-x-2 py-2.5 px-6 bg-white/20 hover:bg-white/30 border border-pink-300/40 rounded-full text-xs font-semibold tracking-wider text-pink-100 transition-all shadow-lg hover:scale-105">
+                        <span>✨ Open Our Special Link</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>
+
+                <div class="pt-4 flex justify-center">
+                    <button id="resetBtn" class="text-xs text-pink-300/70 hover:text-pink-100 underline transition-colors cursor-pointer tracking-wider font-cinzel">
+                        Start Over
+						(FROM YR DADDY)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-6 text-center text-pink-300/70 text-xs tracking-widest animate-pulse pointer-events-none font-cinzel">
+            ✨ Click anywhere to bloom silky-smooth flowers & spark magic ✨
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null;
+        function playMagicalChime() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51];
+                const freq = notes[Math.floor(Math.random() * notes.length)];
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + 1.8);
+            } catch (e) {
+                // Audio context handling
+            }
+        }
+
+        const canvas = document.getElementById('gardenCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        let mouseX = width / 2;
+        let mouseY = height / 2;
+        let mouseVX = 0;
+        let mouseVY = 0;
+        let lastMouseX = mouseX;
+        let lastMouseY = mouseY;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            mouseVX = mouseX - lastMouseX;
+            mouseVY = mouseY - lastMouseY;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+        });
+
+        let petals = [];
+        let fireflies = [];
+        let interactiveBlooms = [];
+
+        class RealPetal {
+            constructor(isForeground = false) {
+                this.isForeground = isForeground;
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.x = Math.random() * width;
+                this.y = initial ? Math.random() * height : -50;
+                this.z = this.isForeground ? Math.random() * 0.5 + 0.8 : Math.random() * 0.6 + 0.2;
+                
+                this.size = (Math.random() * 14 + 9) * this.z;
+                this.vy = (Math.random() * 1.0 + 0.6) * this.z;
+                this.vx = (Math.random() * 0.8 - 0.4) * this.z;
+                
+                this.angleX = Math.random() * Math.PI * 2;
+                this.angleY = Math.random() * Math.PI * 2;
+                this.angleZ = Math.random() * Math.PI * 2;
+                
+                this.spinX = (Math.random() * 0.035 - 0.017);
+                this.spinY = (Math.random() * 0.035 - 0.017);
+                this.spinZ = (Math.random() * 0.025 - 0.0125);
+                
+                this.oscFreq = Math.random() * 0.025 + 0.01;
+                this.oscAmp = Math.random() * 2.2 + 1;
+                this.timeOffset = Math.random() * 100;
+
+                const palette = [
+                    { r: 244, g: 63, b: 94 },
+                    { r: 251, g: 113, b: 133 },
+                    { r: 253, g: 164, b: 175 },
+                    { r: 244, g: 114, b: 182 },
+                    { r: 253, g: 224, b: 71 },
+                    { r: 216, g: 180, b: 254 }
+                ];
+                this.baseColor = palette[Math.floor(Math.random() * palette.length)];
+                this.opacity = (Math.random() * 0.35 + 0.65) * (this.isForeground ? 1 : 0.75);
+                this.shapeType = Math.random() < 0.75 ? 0 : (Math.random() < 0.5 ? 1 : 2);
+            }
+
+            update(globalTime) {
+                const sway = Math.sin(globalTime * this.oscFreq + this.timeOffset) * this.oscAmp;
+                const windGust = Math.sin(globalTime * 0.0012) * 1.2 + 0.4;
+
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                let mouseForceX = 0;
+                let mouseForceY = 0;
+                
+                if (dist < 160) {
+                    const force = (160 - dist) / 160;
+                    mouseForceX = (dx / dist) * force * 3.5 + mouseVX * 0.25;
+                    mouseForceY = (dy / dist) * force * 2.5 + mouseVY * 0.25;
+                }
+
+                this.x += this.vx + sway + windGust + mouseForceX;
+                this.y += this.vy + mouseForceY;
+
+                this.angleX += this.spinX;
+                this.angleY += this.spinY;
+                this.angleZ += this.spinZ;
+
+                if (this.y > height + 50) {
+                    this.reset();
+                    this.y = -50;
+                }
+                if (this.x < -70) this.x = width + 60;
+                if (this.x > width + 70) this.x = -60;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angleZ);
+
+                const scaleX = Math.cos(this.angleX);
+                const scaleY = Math.sin(this.angleY);
+                ctx.scale(scaleX, scaleY);
+
+                ctx.globalAlpha = this.opacity;
+
+                const lightShading = Math.sin(this.angleX) * 25;
+                const r = Math.min(255, Math.max(0, this.baseColor.r + lightShading));
+                const g = Math.min(255, Math.max(0, this.baseColor.g + lightShading));
+                const b = Math.min(255, Math.max(0, this.baseColor.b + lightShading));
+                
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.45)`;
+                ctx.lineWidth = 0.8 * this.z;
+
+                if (this.shapeType === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size);
+                    ctx.bezierCurveTo(this.size * 0.9, -this.size * 0.5, this.size * 0.8, this.size * 0.6, 0, this.size);
+                    ctx.bezierCurveTo(-this.size * 0.8, this.size * 0.6, -this.size * 0.9, -this.size * 0.5, 0, -this.size);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.strokeStyle = `rgba(255, 255, 255, 0.3)`;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size * 0.7);
+                    ctx.lineTo(0, this.size * 0.7);
+                    ctx.stroke();
+                } else if (this.shapeType === 1) {
+                    for (let i = 0; i < 5; i++) {
+                        ctx.rotate((Math.PI * 2) / 5);
+                        ctx.beginPath();
+                        ctx.ellipse(0, -this.size * 0.5, this.size * 0.35, this.size * 0.6, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                    ctx.fillStyle = '#fde047';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size * 1.2);
+                    ctx.quadraticCurveTo(this.size * 0.7, 0, 0, this.size * 1.2);
+                    ctx.quadraticCurveTo(-this.size * 0.7, 0, 0, -this.size * 1.2);
+                    ctx.fillStyle = '#34d399';
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class Firefly {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 3.5 + 1.2;
+                this.baseAlpha = Math.random() * 0.6 + 0.3;
+                this.alpha = this.baseAlpha;
+                this.alphaSpeed = Math.random() * 0.02 + 0.008;
+                this.vx = Math.random() * 0.4 - 0.2;
+                this.vy = Math.random() * 0.4 - 0.2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha += this.alphaSpeed;
+                if (this.alpha > 0.95 || this.alpha < 0.15) {
+                    this.alphaSpeed = -this.alphaSpeed;
+                }
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.fillStyle = '#fef08a';
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class InteractiveBloom {
+            constructor(x, y, delay = 0) {
+                this.x = x;
+                this.y = y;
+                this.progress = 0;
+                this.delay = delay;
+                this.age = 0;
+                this.maxRadius = Math.random() * 35 + 35;
+                this.opacity = 1;
+                
+                const flowerTypes = ['rose', 'sunflower', 'cherry', 'orchid'];
+                this.type = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
+                this.petalCount = Math.floor(Math.random() * 3) + 6;
+                this.color = this.getColorForType(this.type);
+                this.secondaryColor = this.getSecondaryColor(this.type);
+                this.sparkles = [];
+                
+                for (let i = 0; i < 20; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 3 + 1;
+                    this.sparkles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: Math.random() * 4 + 1,
+                        alpha: 1
+                    });
+                }
+            }
+
+            getColorForType(type) {
+                switch(type) {
+                    case 'rose': return '#f43f5e';
+                    case 'sunflower': return '#fbbf24';
+                    case 'cherry': return '#f472b6';
+                    case 'orchid': default: return '#c084fc';
+                }
+            }
+
+            getSecondaryColor(type) {
+                switch(type) {
+                    case 'rose': return '#fb7185';
+                    case 'sunflower': return '#fde047';
+                    case 'cherry': return '#fbcfe8';
+                    case 'orchid': default: return '#e879f9';
+                }
+            }
+
+            update() {
+                if (this.delay > 0) {
+                    this.delay--;
+                    return;
+                }
+
+                if (this.progress < 1) {
+                    // Silky smooth exponential ease-out curve
+                    this.progress += 0.025;
+                    if (this.progress > 1) this.progress = 1;
+                } else {
+                    this.age += 0.016;
+                    if (this.age > 7.0) {
+                        this.opacity -= 0.01;
+                    }
+                }
+                
+                this.sparkles.forEach(s => {
+                    s.x += s.vx;
+                    s.y += s.vy;
+                    s.alpha -= 0.012;
+                });
+            }
+
+            draw(ctx) {
+                if (this.delay > 0 || this.opacity <= 0) return;
+
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.opacity);
+
+                // Spring easing calculation
+                const easeOutVal = 1 - Math.pow(2, -10 * this.progress);
+                const currentRadius = this.maxRadius * easeOutVal;
+
+                // Subtle breathing motion when fully bloomed
+                const breath = this.progress >= 1 ? Math.sin(this.age * 3) * 1.5 : 0;
+                const r = currentRadius + breath;
+
+                // Outer petal whorl
+                for (let i = 0; i < this.petalCount; i++) {
+                    const angle = (i * Math.PI * 2) / this.petalCount + (this.age * 0.1);
+                    const petX = this.x + Math.cos(angle) * (r * 0.6);
+                    const petY = this.y + Math.sin(angle) * (r * 0.6);
+                    
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.ellipse(petX, petY, r * 0.55, r * 0.38, angle, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+                }
+
+                // Inner petal whorl (rotated for organic depth)
+                for (let i = 0; i < this.petalCount; i++) {
+                    const angle = ((i + 0.5) * Math.PI * 2) / this.petalCount - (this.age * 0.1);
+                    const petX = this.x + Math.cos(angle) * (r * 0.35);
+                    const petY = this.y + Math.sin(angle) * (r * 0.35);
+                    
+                    ctx.fillStyle = this.secondaryColor;
+                    ctx.beginPath();
+                    ctx.ellipse(petX, petY, r * 0.4, r * 0.28, angle, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+                
+                // Shimmering pollen center
+                ctx.fillStyle = '#fef08a';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, r * 0.22, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Sparkles burst
+                this.sparkles.forEach(s => {
+                    if (s.alpha > 0) {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.globalAlpha = Math.max(0, s.alpha);
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < 35; i++) petals.push(new RealPetal(false));
+        for (let i = 0; i < 25; i++) petals.push(new RealPetal(true));
+        for (let i = 0; i < 40; i++) fireflies.push(new Firefly());
+
+        let globalTime = 0;
+
+        function animate() {
+            globalTime += 1;
+            ctx.clearRect(0, 0, width, height);
+
+            const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 90, width / 2, height / 2, Math.max(width, height) * 0.85);
+            bgGradient.addColorStop(0, '#1c0c2e');
+            bgGradient.addColorStop(0.5, '#0e0518');
+            bgGradient.addColorStop(1, '#040208');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+
+            fireflies.forEach(f => {
+                f.update();
+                f.draw(ctx);
+            });
+
+            petals.forEach(p => {
+                p.update(globalTime);
+                p.draw(ctx);
+            });
+
+            for (let i = interactiveBlooms.length - 1; i >= 0; i--) {
+                interactiveBlooms[i].update();
+                interactiveBlooms[i].draw(ctx);
+                if (interactiveBlooms[i].opacity <= 0) {
+                    interactiveBlooms.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        const inputScreen = document.getElementById('inputScreen');
+        const gardenScreen = document.getElementById('gardenScreen');
+        const linkInput = document.getElementById('linkInput');
+        const revealBtn = document.getElementById('revealBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const resetBtn = document.getElementById('resetBtn');
+        const customLinkContainer = document.getElementById('customLinkContainer');
+        const customLinkBtn = document.getElementById('customLinkBtn');
+        const userCustomDisplay = document.getElementById('userCustomDisplay');
+
+        revealBtn.addEventListener('click', () => {
+            const val = linkInput.value.trim();
+            if (!val) {
+                errorMsg.classList.remove('hidden');
+                linkInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/50');
+                setTimeout(() => {
+                    linkInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/50');
+                }, 1800);
+                return;
+            }
+
+            playMagicalChime();
+
+            if (val.startsWith('http://') || val.startsWith('https://') || val.includes('.')) {
+                let formattedUrl = val;
+                if (!val.startsWith('http://') && !val.startsWith('https://')) {
+                    formattedUrl = 'https://' + val;
+                }
+                customLinkBtn.href = formattedUrl;
+                customLinkContainer.classList.remove('hidden');
+                userCustomDisplay.textContent = "7th Anniversary Special";
+                userCustomDisplay.classList.remove('hidden');
+            } else {
+                userCustomDisplay.textContent = `For: "${val}"`;
+                userCustomDisplay.classList.remove('hidden');
+                customLinkContainer.classList.add('hidden');
+            }
+
+            // Smooth dissolve input screen
+            inputScreen.classList.add('dissolving');
+            setTimeout(() => {
+                inputScreen.classList.add('hidden');
+                gardenScreen.classList.remove('hidden');
+                gardenScreen.style.pointerEvents = 'auto';
+                gardenScreen.classList.add('appearing');
+            }, 600);
+
+            // Cascading wave of blooming flowers across the screen
+            const waveCount = 18;
+            for (let i = 0; i < waveCount; i++) {
+                const angle = (i / waveCount) * Math.PI * 2;
+                const distance = Math.random() * (Math.min(width, height) * 0.38) + 50;
+                const rx = width / 2 + Math.cos(angle) * distance;
+                const ry = height / 2 + Math.sin(angle) * distance;
+                const delay = Math.floor(i * 3) + Math.floor(Math.random() * 10);
+                
+                interactiveBlooms.push(new InteractiveBloom(rx, ry, delay));
+                if (i % 3 === 0) {
+                    setTimeout(() => playMagicalChime(), delay * 16);
+                }
+            }
+        });
+
+        canvas.addEventListener('click', (e) => {
+            if (gardenScreen.classList.contains('appearing') || gardenScreen.style.opacity === '1') {
+                playMagicalChime();
+                interactiveBlooms.push(new InteractiveBloom(e.clientX, e.clientY, 0));
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            playMagicalChime();
+            gardenScreen.classList.remove('appearing');
+            gardenScreen.style.opacity = '0';
+            gardenScreen.style.pointerEvents = 'none';
+            setTimeout(() => {
+                gardenScreen.classList.add('hidden');
+                inputScreen.classList.remove('dissolving');
+                inputScreen.classList.remove('hidden');
+                inputScreen.style.opacity = '1';
+                inputScreen.style.transform = 'scale(1)';
+                linkInput.value = '';
+                errorMsg.classList.add('hidden');
+            }, 600);
+        });
+
+        linkInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                revealBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
